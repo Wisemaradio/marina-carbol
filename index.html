@@ -198,11 +198,27 @@ var btn=document.getElementById("playBtn");
 function togglePlay(){
 
 if(audio.paused){
+
 audio.play();
 btn.innerHTML="⏸ Pausar";
+
+/* 🔥 MEDIA SESSION CON LOGO NUEVO */
+if ('mediaSession' in navigator) {
+navigator.mediaSession.metadata = new MediaMetadata({
+title: 'Marina Stereo 91.7 FM',
+artist: 'En vivo',
+album: 'El Carmen de Bolívar',
+artwork: [
+{ src: 'logonota.png', sizes: '512x512', type: 'image/png' }
+]
+});
+}
+
 }else{
+
 audio.pause();
 btn.innerHTML="▶ Escuchar en vivo";
+
 }
 
 }
@@ -212,13 +228,19 @@ btn.innerHTML="▶ Escuchar en vivo";
 function compartirRadio(){
 
 if(navigator.share){
+
 navigator.share({
+
 title:"Marina Stereo 91.7 FM",
 text:"Escucha Marina Stereo en vivo",
 url:"https://marinacarbolplay.wisemaradio.com"
+
 });
+
 }else{
+
 alert("Comparte este enlace: https://marinacarbolplay.wisemaradio.com");
+
 }
 
 }
@@ -228,19 +250,27 @@ alert("Comparte este enlace: https://marinacarbolplay.wisemaradio.com");
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt',(e)=>{
+
 e.preventDefault();
+
 deferredPrompt=e;
+
 document.getElementById("installBtn").style.display="block";
+
 });
 
 document.getElementById("installBtn").addEventListener("click",()=>{
+
 deferredPrompt.prompt();
+
 });
 
 /* SERVICE WORKER */
 
 if('serviceWorker' in navigator){
+
 navigator.serviceWorker.register('sw.js');
+
 }
 
 </script>
