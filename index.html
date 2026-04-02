@@ -9,7 +9,6 @@
 <title>Marina Stereo 91.7 FM | El Carmen de Bolívar</title>
 
 <link rel="manifest" href="manifest.json">
-
 <meta name="theme-color" content="#1db954">
 
 <style>
@@ -38,8 +37,6 @@ border-radius:18px;
 width:340px;
 box-shadow:0 0 30px rgba(0,0,0,0.7);
 }
-
-/* CARATULA */
 
 .cover{
 width:200px;
@@ -78,8 +75,6 @@ color:#1db954;
 font-weight:bold;
 }
 
-/* BOTON PLAY */
-
 .play{
 background:#1db954;
 border:none;
@@ -94,8 +89,6 @@ margin-bottom:10px;
 .play:hover{
 background:#17a74a;
 }
-
-/* BOTONES */
 
 .share{
 margin-top:8px;
@@ -202,7 +195,7 @@ if(audio.paused){
 audio.play();
 btn.innerHTML="⏸ Pausar";
 
-/* 🔥 MEDIA SESSION CON LOGO NUEVO */
+/* MEDIA SESSION */
 if ('mediaSession' in navigator) {
 navigator.mediaSession.metadata = new MediaMetadata({
 title: 'Marina Stereo 91.7 FM',
@@ -223,6 +216,60 @@ btn.innerHTML="▶ Escuchar en vivo";
 
 }
 
+/* 🔥 METADATOS COMO VARIADISIMA */
+
+async function actualizarMetadata(){
+
+try{
+
+let res = await fetch("https://marina-carbol.wisemaradio.com/api/nowplaying/marina-carbol?nocache=" + new Date().getTime());
+let data = await res.json();
+
+let texto = data.now_playing.song.text;
+
+/* VALIDACIÓN CLAVE */
+if(
+texto &&
+texto.trim() !== "" &&
+texto !== " - " &&
+!texto.toLowerCase().includes("http") &&
+texto.length > 5
+){
+
+/* LIMPIEZA */
+texto = texto.replace('.mp3','').replace('.MP3','').trim();
+
+document.getElementById("songTitle").innerHTML = "🎶 " + texto;
+
+/* ACTUALIZA NOTIFICACIÓN */
+if ('mediaSession' in navigator) {
+navigator.mediaSession.metadata = new MediaMetadata({
+title: texto,
+artist: 'En vivo',
+album: 'Marina Stereo',
+artwork: [
+{ src: 'logonota.png', sizes: '512x512', type: 'image/png' }
+]
+});
+}
+
+}else{
+
+document.getElementById("songTitle").innerHTML = "🎵 En vivo";
+
+}
+
+}catch(e){
+
+document.getElementById("songTitle").innerHTML = "🎵 En vivo";
+
+}
+
+}
+
+setInterval(actualizarMetadata, 10000);
+actualizarMetadata();
+
 /* COMPARTIR */
 
 function compartirRadio(){
@@ -230,11 +277,9 @@ function compartirRadio(){
 if(navigator.share){
 
 navigator.share({
-
 title:"Marina Stereo 91.7 FM",
 text:"Escucha Marina Stereo en vivo",
 url:"https://marinacarbolplay.wisemaradio.com"
-
 });
 
 }else{
@@ -250,31 +295,22 @@ alert("Comparte este enlace: https://marinacarbolplay.wisemaradio.com");
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt',(e)=>{
-
 e.preventDefault();
-
 deferredPrompt=e;
-
 document.getElementById("installBtn").style.display="block";
-
 });
 
 document.getElementById("installBtn").addEventListener("click",()=>{
-
 deferredPrompt.prompt();
-
 });
 
 /* SERVICE WORKER */
 
 if('serviceWorker' in navigator){
-
 navigator.serviceWorker.register('sw.js');
-
 }
 
 </script>
 
 </body>
-
 </html>
