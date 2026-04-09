@@ -184,6 +184,8 @@ El Carmen de Bolívar - Colombia
 
 <script>
 
+/* PLAYER */
+
 var audio=document.getElementById("radio");
 var btn=document.getElementById("playBtn");
 
@@ -192,9 +194,92 @@ function togglePlay(){
 if(audio.paused){
 audio.play();
 btn.innerHTML="⏸ Pausar";
+
+if ('mediaSession' in navigator) {
+navigator.mediaSession.metadata = new MediaMetadata({
+title: 'Marina Stereo 91.7 FM',
+artist: 'En vivo',
+album: 'El Carmen de Bolívar',
+artwork: [
+{ src: 'logonota.png', sizes: '512x512', type: 'image/png' }
+]
+});
+}
+
 }else{
 audio.pause();
 btn.innerHTML="▶ Escuchar en vivo";
+}
+
+}
+
+/* 🔥 METADATOS CORRECTOS */
+
+async function actualizarMetadata(){
+
+try{
+
+let res = await fetch("https://marina-carbol.wisemaradio.com/api/nowplaying/marina-carbol?nocache=" + new Date().getTime());
+let data = await res.json();
+
+let texto = data.now_playing.song.text;
+
+if(
+texto &&
+texto.trim() !== "" &&
+texto !== " - " &&
+!texto.toLowerCase().includes("http") &&
+texto.length > 5
+){
+
+texto = texto.replace('.mp3','').replace('.MP3','').trim();
+
+document.getElementById("songTitle").innerHTML = "🎶 " + texto;
+
+if ('mediaSession' in navigator) {
+navigator.mediaSession.metadata = new MediaMetadata({
+title: texto,
+artist: 'En vivo',
+album: 'Marina Stereo',
+artwork: [
+{ src: 'logonota.png', sizes: '512x512', type: 'image/png' }
+]
+});
+}
+
+}else{
+
+document.getElementById("songTitle").innerHTML = "🎵 En vivo";
+
+}
+
+}catch(e){
+
+document.getElementById("songTitle").innerHTML = "🎵 En vivo";
+
+}
+
+}
+
+setInterval(actualizarMetadata, 10000);
+actualizarMetadata();
+
+/* COMPARTIR */
+
+function compartirRadio(){
+
+if(navigator.share){
+
+navigator.share({
+title:"Marina Stereo 91.7 FM",
+text:"Escucha Marina Stereo en vivo",
+url:"https://marinacarbolplay.wisemaradio.com"
+});
+
+}else{
+
+alert("Comparte este enlace: https://marinacarbolplay.wisemaradio.com");
+
 }
 
 }
@@ -214,8 +299,6 @@ if(deferredPrompt){
 deferredPrompt.prompt();
 }
 });
-
-/* MOSTRAR BOTÓN */
 
 window.addEventListener('load', () => {
 setTimeout(() => {
