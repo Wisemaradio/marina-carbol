@@ -1,42 +1,27 @@
-self.addEventListener('install', function(event) {
+const CACHE_NAME = 'marina-pwa-v3';
 
-    event.waitUntil(
-        caches.open('radio-cache-v2').then(function(cache) {
-            return cache.addAll([
-                '/index.html',
-                '/logo.jpg',
-                '/banner.jpg'
-            ]);
-        })
-    );
-
-    self.skipWaiting();
+self.addEventListener('install', event => {
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', function(event) {
-
-    event.waitUntil(
-        caches.keys().then(function(cacheNames) {
-            return Promise.all(
-                cacheNames.map(function(cacheName) {
-                    if (cacheName !== 'radio-cache-v2') {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-
-    self.clients.claim();
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => {
+        if (k !== CACHE_NAME) return caches.delete(k);
+      }))
+    )
+  );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', event => {
 
-    if (event.request.url.includes('/listen/')) return;
+  const url = event.request.url;
 
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
+  // ❌ no cachear streaming ni api
+  if (url.includes('/listen/') || url.includes('/api/')) return;
+
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+
 });
