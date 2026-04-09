@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marina-pwa-v3';
+const CACHE_NAME = 'marina-final-v4';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -19,9 +19,20 @@ self.addEventListener('fetch', event => {
 
   const url = event.request.url;
 
-  // ❌ no cachear streaming ni api
-  if (url.includes('/listen/') || url.includes('/api/')) return;
+  // 🔥 NO tocar streaming NI API (CLAVE)
+  if (
+    url.includes('/listen/') ||
+    url.includes('/api/') ||
+    url.includes('nowplaying')
+  ) {
+    return;
+  }
 
-  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+  // Solo cache básico
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
 
 });
