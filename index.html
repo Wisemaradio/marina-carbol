@@ -107,7 +107,7 @@ border-radius:25px;
 color:white;
 cursor:pointer;
 margin:12px auto 0 auto;
-display:block;
+display:none; /* 🔥 inicia oculto */
 width:100%;
 }
 
@@ -240,17 +240,32 @@ url:"https://marinacarbolplay.wisemaradio.com"
 
 }
 
-/* INSTALAR */
+/* 🔥 INSTALACIÓN PRO */
 
 let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+// detectar si ya está instalada
+function esAppInstalada() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+// ocultar si ya es app
+if (esAppInstalada()) {
+  installBtn.style.display = "none";
+}
 
 window.addEventListener('beforeinstallprompt',(e)=>{
 e.preventDefault();
 deferredPrompt=e;
-document.getElementById("installBtn").style.display="block";
+
+if (!esAppInstalada()) {
+  installBtn.style.display="block";
+}
+
 });
 
-document.getElementById("installBtn").addEventListener("click",()=>{
+installBtn.addEventListener("click",()=>{
 if(deferredPrompt){
 deferredPrompt.prompt();
 }
