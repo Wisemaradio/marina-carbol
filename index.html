@@ -194,7 +194,7 @@ btn.innerHTML="▶ Escuchar en vivo";
 
 }
 
-/* 🔥 LOGO EN BLOQUEO (FIJO - NO TOCA METADATOS) */
+/* 🔥 LOGO EN BLOQUEO (NO TOCA METADATOS) */
 if ('mediaSession' in navigator) {
 navigator.mediaSession.metadata = new MediaMetadata({
 title: "Marina Stereo 91.7 FM",
@@ -207,7 +207,7 @@ artwork: [
 });
 }
 
-/* METADATOS (SIN CAMBIOS) */
+/* METADATOS (TUYO ORIGINAL) */
 
 async function actualizarMetadata(){
 
@@ -253,23 +253,30 @@ url:"https://marinacarbolplay.wisemaradio.com"
 
 }
 
-/* INSTALAR */
+/* 🔥 INSTALACIÓN (CORRECTA) */
 
 let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+/* 🔴 OCULTAR SOLO EN APP */
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+  installBtn.style.display = "none";
+}
 
 window.addEventListener('beforeinstallprompt',(e)=>{
 e.preventDefault();
-deferredPrompt=e;
-document.getElementById("installBtn").style.display="block";
+deferredPrompt = e;
 });
 
-document.getElementById("installBtn").addEventListener("click",()=>{
+installBtn.addEventListener("click",()=>{
 if(deferredPrompt){
 deferredPrompt.prompt();
+}else{
+alert("Para instalar usa el menú del navegador");
 }
 });
 
-/* SERVICE WORKER */
+/* SW */
 
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('sw.js');
