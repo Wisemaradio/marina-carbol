@@ -194,7 +194,20 @@ btn.innerHTML="▶ Escuchar en vivo";
 
 }
 
-/* METADATOS */
+/* 🔥 LOGO EN BLOQUEO (FIJO - NO TOCA METADATOS) */
+if ('mediaSession' in navigator) {
+navigator.mediaSession.metadata = new MediaMetadata({
+title: "Marina Stereo 91.7 FM",
+artist: "En vivo",
+album: "El Carmen de Bolívar",
+artwork: [
+{ src: 'logo-192.png', sizes: '192x192', type: 'image/png' },
+{ src: 'logo-512.png', sizes: '512x512', type: 'image/png' }
+]
+});
+}
+
+/* METADATOS (SIN CAMBIOS) */
 
 async function actualizarMetadata(){
 
@@ -240,32 +253,23 @@ url:"https://marinacarbolplay.wisemaradio.com"
 
 }
 
-/* 🔥 INSTALACIÓN (COMPORTAMIENTO CORRECTO) */
+/* INSTALAR */
 
 let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
 
-// 🔴 SI ESTÁ EN APP → OCULTAR
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-  installBtn.style.display = "none";
-}
-
-// 🟢 EN NAVEGADOR → SIEMPRE DISPONIBLE
 window.addEventListener('beforeinstallprompt',(e)=>{
 e.preventDefault();
-deferredPrompt = e;
+deferredPrompt=e;
+document.getElementById("installBtn").style.display="block";
 });
 
-// CLICK
-installBtn.addEventListener("click",()=>{
+document.getElementById("installBtn").addEventListener("click",()=>{
 if(deferredPrompt){
 deferredPrompt.prompt();
-}else{
-alert("Para instalar, usa el menú del navegador (Agregar a pantalla principal)");
 }
 });
 
-/* SW */
+/* SERVICE WORKER */
 
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('sw.js');
